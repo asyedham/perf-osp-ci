@@ -194,7 +194,7 @@ tenant_allocation_pools_end: 172.17.2.150
 tenant_network_vlan_id: 304
 #This allows the user to force re provision undercloud
 #default is false - not forced
-force_reprovision: "{{ lookup('env', 'FORCE_REPROVISION')|default('false', true) }}"
+force_reprovision: "{{ lookup('env', 'FORCE_REPROVISION')|default(false, true)|bool }}"
 #This enables user to have a undercloud in VM
 #NOTE: now the vm is created in the ansible host, so
 #do not enable this while running from your desktop
@@ -261,7 +261,7 @@ scale_compute_vms: false
 #Specify the controller ifaces for composable roles explicitly in
 #case you need specific machines as controllers. Else default controller
 #machine type is the first node in overcloud_instackenv.json
-composable_roles: "{{ lookup('env', 'COMPOSABLE_ROLES')|default('false', true) }}"
+composable_roles: "{{ lookup('env', 'COMPOSABLE_ROLES')|default(false, true) }}"
 #controller_ifaces: []
 # if your machine is 1029U type you need to specify the product type also
 # refer http://wiki.scalelab.redhat.com/1029u/ for list of 1029utn10rt machines
