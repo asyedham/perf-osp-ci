@@ -9,7 +9,7 @@ cloud_name: "{{ lookup('env', 'CLOUD_NAME')|default('cloud00', true) }}"
 lab_name: "{{ lookup('env', 'LAB_NAME')|default('None', true) }}"
 ansible_ssh_pass: "{{ lookup('env', 'ANSIBLE_SSH_PASSWORD')|default('', true) }}"
 ansible_ssh_key: "{{ ansible_user_dir }}/.ssh/id_rsa"
-osp_release: "{{ lookup('env', 'OSP_VERSION')|default('', true) }}"
+osp_release: "{{ lookup('env', 'OSP_VERSION')|default('', true)|float }}"
 osp_puddle: "{{ lookup('env', 'OSP_PUDDLE')|default('', true) }}"
 baseurl: http://download.eng.pek2.redhat.com/released/RHEL-7/7.9/Server/x86_64/os/
 nic_configs: "{{ ansible_user_dir }}/virt"
