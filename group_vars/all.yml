@@ -291,4 +291,4 @@ foreman_url: "{{ lookup('env', 'FOREMAN_URL')|default('', true) }}"
 manila_enabled: false
 
 #image path for overcloud nodes
-#remote_image_path: "{{ lookup('env', 'REMOTE_IMAGE_PATH')|default('', true) }}"
+remote_image_path: "{{ lookup('env', 'REMOTE_IMAGE_PATH')|default('', true) }}"
