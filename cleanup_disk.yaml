@@ -1,0 +1,17 @@
+---
+- hosts: undercloud
+  tasks:
+    - name: delete overcloud
+      shell: |
+        source ~/stackrc
+        openstack overcloud delete overcloud -y -b ~/virt/network/network_data_v2.yaml  --networks-file ~/virt/network/network_data_v2.yaml --network-ports
+        
+    - name: move the nodes to manageable state
+      shell: |
+        source ~/stackrc
+        for i in $(openstack baremetal node list -c UUID -f value); do openstack baremetal node manage $i; done
+   
+    - name: clean the nodes and move to available
+      shell: |
+        source ~/stackrc
+        openstack overcloud node clean --all-manageable --provide
