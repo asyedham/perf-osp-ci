@@ -4,8 +4,8 @@
     - name: delete overcloud
       shell: |
         source ~/stackrc
-        openstack overcloud delete overcloud -y -b ~/virt/network/network_data_v2.yaml  --networks-file ~/virt/network/network_data_v2.yaml --network-ports
-        
+        openstack overcloud node unprovision --all ~/virt/network/baremetal_deployment.yaml -y        
+    
     - name: move the nodes to manageable state
       shell: |
         source ~/stackrc
