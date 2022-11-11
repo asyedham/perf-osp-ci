@@ -289,6 +289,3 @@ introspection_timeout: "{{ lookup('env', 'INTROSPECTION_TIMEOUT')|default('2400'
 overcloud_timeout: "{{ lookup('env', 'OVERCLOUD_TIMEOUT')|default('560', true) }}"
 foreman_url: "{{ lookup('env', 'FOREMAN_URL')|default('', true) }}"
 manila_enabled: false
-
-#image path for overcloud nodes
-#remote_image_path: "{{ lookup('env', 'REMOTE_IMAGE_PATH')|default('', true) }}"
