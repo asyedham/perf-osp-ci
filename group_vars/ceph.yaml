@@ -1,0 +1,291 @@
+---
+infrared_dir: "{{ ansible_user_dir }}/infrared"
+infrared_workspaces_dir: "{{ ansible_user_dir }}/.infrared/.workspaces"
+infrared_hosts_file: "{{ infrared_workspaces_dir }}/active/hosts"
+instackenv_file: "/var/lib/jenkins/instackenv.json"
+undercloud_conf: "{{ ansible_user_dir }}/undercloud.conf"
+log_directory: "{{ playbook_dir }}/logs"
+cloud_name: "{{ lookup('env', 'CLOUD_NAME')|default('cloud00', true) }}"
+lab_name: "{{ lookup('env', 'LAB_NAME')|default('None', true) }}"
+ansible_ssh_pass: "{{ lookup('env', 'ANSIBLE_SSH_PASSWORD')|default('', true) }}"
+ansible_ssh_key: "{{ ansible_user_dir }}/.ssh/id_rsa"
+osp_release: "{{ lookup('env', 'OSP_VERSION')|default('', true) }}"
+osp_puddle: "{{ lookup('env', 'OSP_PUDDLE')|default('', true) }}"
+baseurl: http://download.eng.pek2.redhat.com/released/RHEL-7/7.9/Server/x86_64/os/
+nic_configs: "{{ ansible_user_dir }}/virt"
+controller_count: 3
+# No need to set compute_count. This will be set to all remaining nodes, which is calculated in overcloud.yml
+#compute_count: 1
+ceph_node_count: 3
+set_boot_order: true
+alias:
+#lab specific vars
+  lab_url: "http://quads.alias.bos.scalelab.redhat.com"
+  machine_types:
+    dell:
+      740xd: 
+        rhel7_interfaces: [em2, em1, p7p1, p7p2]
+        rhel8_interfaces: [eno2, eno1, ens7f0, ens7f1]
+        rhel9_interfaces: [eno2, eno1, ens7f0, ens7f1]
+    supermicro:
+      6029r:
+        rhel7_interfaces: [enp95s0f1, enp95s0f0, enp94s0f0, enp94s0f1]
+        rhel8_interfaces: [enp95s0f1, enp95s0f0, enp94s0f0, enp94s0f1]
+      6048p:
+        rhel7_interfaces: [enp130s0f1, enp130s0f0, enp4s0f0, enp4s0f1]
+        rhel8_interfaces: [enp130s0f1, enp130s0f0, enp4s0f0, enp4s0f1]
+
+scale:
+# lab specific vars
+  lab_url: "http://quads.rdu2.scalelab.redhat.com"
+  machine_types:
+    supermicro:
+      1029p:
+        rhel7_interfaces: [enp94s0f0, enp94s0f1, enp94s0f2, enp94s0f3]
+        rhel8_interfaces: [ens2f0, ens2f1, ens2f2, ens2f3]
+        rhel9_interfaces: [ens2f0, ens2f1, ens2f2, ens2f3]
+      1029utrtp:
+        rhel7_interfaces: [enp175s0f0, enp175s0f1, enp216s0f0, enp216s0f1]
+        rhel8_interfaces: [ens1f0, ens1f1, ens2f0, ens2f1]
+        rhel9_interfaces: [ens1f0, ens1f1, ens2f0, ens2f1]
+      1029utn10rt:
+        rhel7_interfaces: [enp175s0f0, enp175s0f1, enp216s0f0, enp216s0f1]
+        rhel8_interfaces: [enp175s0f0, enp175s0f1, ens2f0, ens2f1]
+        rhel9_interfaces: [enp175s0f0, enp175s0f1, ens2f0, ens2f1]
+      6048r:
+        rhel7_interfaces: [enp4s0f0, enp4s0f1, enp131s0f0, enp131s0f1]
+        rhel8_interfaces: []
+      5039ms:
+        rhel7_interfaces:  [enp1s0f0, enp1s0f1, enp2s0f1]
+        rhel8_interfaces:  [enp1s0f0, enp1s0f1, enp2s0f1]
+        rhel9_interfaces:  [enp1s0f0, enp1s0f1, enp2s0f1]
+      6049p:
+        rhel7_interfaces: [enp175s0f0, enp175s0f1, enp216s0f0, enp216s0f1]
+        rhel8_interfaces: [ens3f0, ens3f1, ens2f0, ens2f1]
+        rhel9_interfaces: [eno1, eno2, enp4s0f0, enp4s0f1]
+
+      6048p:
+        rhel7_interfaces:  []
+        rhel8_interfaces:  []
+      6018r:
+        rhel7_interfaces: [eno1, eno2, enp4s0f0, enp4s0f1]
+        rhel8_interfaces: [eno1, eno2, enp4s0f0, enp4s0f1]
+
+    dell:
+      r620:
+        rhel7_interfaces: [p2p3, p2p4, em1, em2]
+        rhel8_interfaces: [enp66s0f2, enp66s0f3, eno1, eno2]
+      r630:
+        rhel7_interfaces: [em1, em2, em3, em4]
+        rhel8_interfaces: [eno1, eno2, eno3, eno4]
+        rhel9_interfaces: [eno1, eno2, eno3, eno4]
+      r730xd:
+        rhel7_interfaces: [em1, em2, p4p1, p4p2]
+        rhel8_interfaces: []
+      r930:
+        rhel7_interfaces: [em1, em2, p1p1, p1p2]
+        rhel8_interfaces: []
+      r640:
+        rhel7_interfaces: [p1p1, p1p2, p2p1, p2p2]
+        rhel7_interfaces_f04: [p3p1, p3p2, p2p1, p2p2]
+        rhel8_interfaces: [ens1f0, ens1f1, ens2f0, ens2f1]
+        rhel8_interfaces_f04: [ens3f0, ens3f1, ens2f0, ens2f1]
+        rhel9_interfaces: [ens1f0, ens1f1, ens2f0np0, ens2f1np1]
+        rhel9_interfaces_f04: []
+      r650:
+        rhel7_interfaces: []
+        rhel8_interfaces: [ens1f0, ens1f1, ens2f0, ens2f1]
+        rhel9_interfaces: [ens1f0, ens1f1, ens2f0np0, ens2f1np1]
+
+# Other lab machines have to define their interfaces through below
+# 'interfaces' variable. prepare_nic_configs.yml will use that
+# instead of deriving from
+# scale/alias.machine_types.supermicro/dell...interfaces
+# note: If you are using scale lab or alias lab, don't enable below
+# 'interfaces' parameter.
+interfaces:
+  rhel8_interfaces: [eno1]
+  rhel7_interfaces: [em1]
+
+# Scale lab can provide us public external network on 4th interface
+# We can use that to access overcloud VM's from outside undercloud.
+# To use this feature set 'public_external_interface: true' and
+# assign 4th nic to external_interface to 4th nic and
+# define external_XXXXXX parameters wth CIDR provided by lab team
+# Don't define external_network_vlan_id as lab team might have
+# created their own vlan for this external network implementation.
+#public_external_interface: false
+# set this based on osp version. For example, for 1029p nodes if the
+# osp version is 14 and above set it to ens2f3, otherwise to enp94s0f3.
+# You can refer above table or scale lab wiki for this interface name.
+#external_interface: ens2f3
+# overcloud provider external network. This external network will be created
+# after overcloud deployment as part of post deployment tasks.
+#public_net_name: public
+
+#extra_templates:
+
+#heat_configs:
+  # Enable root user password for all nodes
+#  NodeRootPassword: "{{ ansible_ssh_pass }}"
+#  SshServerOptions:
+#    PasswordAuthentication: 'yes'
+#    PermitRootLogin: 'yes'
+#if you need vlan tenant network enable the below lines
+# - NeutronNetworkType=vlan
+# - NeutronBridgeMappings=openshift:br-openshift,datacentre:br-ex
+# - NeutronNetworkVLANRanges=openshift:500:1000,datacentre:1:500
+# - ComputeParameters.NeutronBridgeMappings=openshift:br-openshift
+
+#resource_registry:
+  # Enable root user password for all nodes
+#  - OS::TripleO::NodeUserData=/usr/share/openstack-tripleo-heat-templates/firstboot/userdata_root_password.yaml
+#  - OS::TripleO::Services::Sshd=/usr/share/openstack-tripleo-heat-templates/deployment/sshd/sshd-baremetal-puppet.yaml
+
+# containers params
+registry_mirror: "{{ lookup('env', 'OSP_REGISTRY_MIRROR')|default('', true) }}"
+registry_namespace: "{{ lookup('env', 'OSP_REGISTRY_NAMESPACE')|default('', true) }}"
+insecure_registries: "{{ lookup('env', 'OSP_INSECURE_REGISTRIES')|default('', true) }}"
+#undercloud.conf default section
+undercloud_public_host: 192.168.24.2
+undercloud_admin_host: 192.168.24.3
+# undercloud.conf ctlplane-subnet section config options
+cidr: "{{ lookup('env', 'CIDR')|default('', true) }}"
+gateway: 192.168.24.1
+dhcp_start: "{{ lookup('env', 'DHCP_START')|default('', true) }}"
+dhcp_end: "{{ lookup('env', 'DHCP_END')|default('', true) }}"
+inspection_iprange: "{{ lookup('env', 'INSPECTION_IPRANGE')|default('', true) }}"
+# external network params for adding external network to
+# undercloud to access overcloud resources
+external_gateway: 172.18.0.1/16
+external_network_vlan_id: 300
+clean_nodes: false
+#adding changes 
+external_net_cidr: 172.18.0.0/16
+external_allocation_pools_start: 172.18.0.50
+external_allocation_pools_end: 172.18.0.150
+external_interface_default_route: 172.18.0.1
+overcloud_external_net_alloc_start: 172.18.1.1
+overcloud_external_net_alloc_end: 172.18.254.254
+
+#internal
+internal_api_net_cidr: 172.17.1.0/24
+internal_api_allocation_pools_start: 172.17.1.10
+internal_api_allocation_pools_end: 172.17.1.149
+internal_api_network_vlan_id: 301
+#storage
+storage_net_cidr: 172.17.3.0/24
+storage_allocation_pools_start: 172.17.3.10
+storage_allocation_pools_end: 172.17.3.149
+storage_network_vlan_id: 302
+storage_mgmt_net_cidr: 172.17.4.0/24
+storage_mgmt_allocation_pools_start: 172.17.4.10
+storage_mgmt_allocation_pools_end: 172.17.4.149
+storage_mgmt_network_vlan_id: 303
+#storage_nfs
+storage_nfs_net_cidr: 172.17.5.0/24
+storage_nfs_network_vlan_id: 305
+storage_nfs_allocation_pools_start: 172.17.5.10
+storage_nfs_allocation_pools_end: 172.17.5.149
+#tenant
+tenant_net_cidr: 172.17.2.0/24
+tenant_allocation_pools_start: 172.17.2.10
+tenant_allocation_pools_end: 172.17.2.150
+tenant_network_vlan_id: 304
+#This allows the user to force re provision undercloud
+#default is false - not forced
+force_reprovision: "{{ lookup('env', 'FORCE_REPROVISION')|default(false, true)|bool }}"
+#This enables user to have a undercloud in VM
+#NOTE: now the vm is created in the ansible host, so
+#do not enable this while running from your desktop
+virtual_uc: false
+undercloud_host: 172.16.0.2
+vm_external_interface: eth0
+undercloud_local_interface: eth0
+virtual_uc_ctlplane_interface: em1
+vm_image_url:
+   rhel7: https://url.corp.redhat.com/rhel-guest-image-7-6-210-x86-64-qcow2
+   rhel8: http://download.hosts.prod.upshift.rdu2.redhat.com/released/RHEL-8/8.1.0/BaseOS/x86_64/images/rhel-guest-image-8.1-263.x86_64.qcow2
+   rhel8_2: http://download.eng.pek2.redhat.com/released/RHEL-8/8.2.0/BaseOS/x86_64/images/rhel-guest-image-8.2-290.x86_64.qcow2
+#Neutron backend, if not set default will be used.
+#neutron_backend: ovn
+#ocp installation
+shift_stack: false
+vlan_provider_network: false
+#browbeat installation
+#installs browbeat, if this variable is not defined or set true
+#skips browbeat installation, only if the variable set false
+browbeat: true
+
+# define mount_nvme to mount /var/lib/nova on nvme device
+# to use nvme storage for nova instances as ephemeral disk
+#mount_nvme: true
+
+# enable nvme parameters
+# README has details about how to get these values
+#passthrough_nvme:
+#    vendor_id: '144d'
+#    product_id: 'a804'
+#    address: '01:00.0'
+#    flavor:
+#      name: 'nvme'
+#      ram: 16384
+#      disk: 40
+#      vcpus: 4
+#pci_node_count: 0
+# if your machine is 1029U type you need to specify the product type also
+# refer http://wiki.scalelab.redhat.com/1029u/ for list of 1029utn10rt machines
+# rest are 1029utrtp machines
+#pci_node_type: '1029p'
+
+
+#For Nova-less provisioning enable the variable
+novaless_prov: false
+
+new_nodes_instack: "{{ playbook_dir }}/newnodes.json"
+
+# This feature creates VMs on hypervisors and uses them as overcloud
+# compute nodes to simulate overcloud scale deployment. This feature
+# requires control plane network tuning as below
+scale_compute_vms: false
+#undercloud_public_host: 192.168.0.2
+#undercloud_admin_host: 192.168.0.3
+#cidr: 192.168.0.0/16
+#gateway: 192.168.0.1
+#dhcp_start: 192.168.0.5
+#dhcp_end: 192.168.10.254
+#inspection_iprange: 192.168.11.1,192.168.20.254
+
+# Enables composable_roles
+# If lab_name not in [scale, alias] set undercloud_local_interface.
+#Specify the controller ifaces for composable roles explicitly in
+#case you need specific machines as controllers. Else default controller
+#machine type is the first node in overcloud_instackenv.json
+composable_roles: "{{ lookup('env', 'COMPOSABLE_ROLES')|default(false, true)|bool }}"
+#controller_ifaces: []
+# if your machine is 1029U type you need to specify the product type also
+# refer http://wiki.scalelab.redhat.com/1029u/ for list of 1029utn10rt machines
+# rest are 1029utrtp machines
+#controller_machine_type: "1029p"
+
+#Ceph deployment params
+ceph_ifaces: "{{ lookup('env', 'CEPH_IFACES')|default('[]', true) }}"
+# if your machine is 1029U type you need to specify the product type also
+# refer http://wiki.scalelab.redhat.com/1029u/ for list of 1029utn10rt machines
+# rest are 1029utrtp machines
+ceph_machine_type: "{{ lookup('env', 'CEPH_MACHINE_TYPE')|default('', true) }}"
+ceph_enabled: "{{ lookup('env', 'CEPH_ENABLED')|default('', true)|bool }}"
+osd_scenario: lvm
+osd_objectstore: bluestore
+#Note:By default storage_node_disks can be detected automatically
+#using introspection data
+#storage_node_disks: ['/dev/nvme0n1']
+#osd_pool_default_pg_num:
+#osd_pool_default_pgp_num:
+
+#Default value for introspection timeout is 2400s, but user can configure
+#the timeout for large cloud
+introspection_timeout: "{{ lookup('env', 'INTROSPECTION_TIMEOUT')|default('2400', true) }}"
+overcloud_timeout: "{{ lookup('env', 'OVERCLOUD_TIMEOUT')|default('560', true) }}"
+foreman_url: "{{ lookup('env', 'FOREMAN_URL')|default('', true) }}"
+manila_enabled: false
