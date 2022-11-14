@@ -269,7 +269,7 @@ composable_roles: "{{ lookup('env', 'COMPOSABLE_ROLES')|default(false, true)|boo
 #controller_machine_type: "1029p"
 
 #Ceph deployment params
-ceph_ifaces: "{{ lookup('env', 'CEPH_IFACES')|default('[]', true) }}"
+ceph_ifaces: [ens2f0, ens2f1, ens2f2, ens2f3]
 # if your machine is 1029U type you need to specify the product type also
 # refer http://wiki.scalelab.redhat.com/1029u/ for list of 1029utn10rt machines
 # rest are 1029utrtp machines
