@@ -12,13 +12,18 @@
 #    This file can be used directly to run rally workloads through Browbeat.
 #    $source .browbeat-venv/bin/activate && ./browbeat.py -s <workload>-browbeat-config.yaml rally
 
-- hosts: localhost
+- hosts: undercloud
   vars:
     VCPU: 0
     MEMORY_MB: 0
     DISK_GB: 0
 
   tasks:
+    - name: Clone osp-ci on undercloud
+      git:
+        repo: https://github.com/asyedham/osp-ci.git
+        dest: /home/stack/
+        
     - name: Get raw output from placement CLI
       shell: |
         source /home/stack/overcloudrc
@@ -117,5 +122,12 @@
 
     - name: Generate browbeat-config.yaml
       template:
-        src: browbeat-config.yaml.j2
+        src: /home/stack/osp-ci/browbeat/browbeat-config.yaml.j2
         dest: "/home/stack/browbeat/{{ workload }}-browbeat-config.yaml"
+        
+    - name:  Run the workloads
+      shell: |
+         source .venv/bin/activate
+         ./browbeat.py -s "{{ workload }}-browbeat-config.yaml"
+      args:
+        chdir: "/home/stack/browbeat"
