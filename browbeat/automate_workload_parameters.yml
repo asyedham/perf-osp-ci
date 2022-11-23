@@ -1,0 +1,121 @@
+# Playbook to automate workload parameters for Browbeat
+#
+# This playbook generates a browbeat-config.yaml with parameters auto-filled based on
+# the available VCPUs, Memory, Disk, and number of compute nodes in the OSP env.
+#
+# Usage :
+# 1) Pass an environment variable from Jenkins named WORKLOAD.
+#    WORKLOAD can have the following values mentioned below.
+#    <api/nova/neutron-trunk/nova-boot-in-batches-with-delay/dynamic-workloads/octavia/heat>
+# 2) Run $ansible-playbook automate_workload_parameters.yml
+# 3) A file named <workload>-browbeat-config.yaml will be generated in /home/stack/browbeat.
+#    This file can be used directly to run rally workloads through Browbeat.
+#    $source .browbeat-venv/bin/activate && ./browbeat.py -s <workload>-browbeat-config.yaml rally
+
+- hosts: localhost
+  vars:
+    VCPU: 0
+    MEMORY_MB: 0
+    DISK_GB: 0
+
+  tasks:
+    - name: Get raw output from placement CLI
+      shell: |
+        source /home/stack/overcloudrc
+        openstack allocation candidate list --resource VCPU=1 --resource DISK_GB=1 --resource MEMORY_MB=1 --os-placement-api-version 1.10
+      register: raw_placement_output
+
+    - name: Get number of compute nodes
+      shell: |
+        source /home/stack/overcloudrc
+        openstack network agent list | grep compute | grep ovn-controller | wc -l
+      register: compute_node_count
+
+    - name: Get external network id
+      shell: |
+        source /home/stack/overcloudrc
+        openstack network list | grep public | cut -d "|" -f 2 | tr -d '[:space:]'
+      register: ext_net_id
+
+    - name: Get external interface
+      shell: |
+        ip a | grep 300@ | cut -d ":" -f 2 | cut -d "." -f 1 | tr -d '[:space:]'
+      register: external_iface_name
+
+    - name: Get mac address of external interface
+      shell: |
+        ip a | grep 300@ -A 1 | grep link/ether | cut -d " " -f 6 | tr -d '[:space:]'
+      register: external_iface_mac
+
+    - name: Process placement data from raw output
+      set_fact:
+        VCPU={{ VCPU|int + item.split("|")[-2].split(",")[0].split("=")[-1].split("/")[-1]|int - item.split("|")[-2].split(",")[0].split("=")[-1].split("/")[0]|int }}
+        MEMORY_MB={{ MEMORY_MB|int + item.split("|")[-2].split(",")[1].split("=")[-1].split("/")[-1]|int - item.split("|")[-2].split(",")[1].split("=")[-1].split("/")[0]|int }}
+        DISK_GB={{ item.split("|")[-2].split(",")[-1].split("=")[-1].split("/")[-1]|int - item.split("|")[-2].split(",")[-1].split("=")[-1].split("/")[0]|int }}
+      when: "{{ item.split('|')|length > 1 and 'allocation' not in item }}"
+      with_items: "{{ raw_placement_output.stdout_lines }}"
+
+    - name: Get workload name
+      set_fact:
+        workload: "{{ lookup('ansible.builtin.env', 'WORKLOAD', default=undef()) }}"
+
+    # The workloads have been set to use 50% of available VCPUs, 60% of available memory, and a maximum of 120 VMs per compute node,
+    # in order to prevent the environment from becoming unstable.
+    #
+    # We usually use the m1.small flavor for VMs in nova-boot-in-batches-with-delay.
+    # The m1.small flavor requires 1 VCPU, 2048 MB of memory, and 20 GB of disk.
+    - name: Set times for nova-boot-in-batches-with-delay
+      set_fact:
+        times={{ [VCPU|int // 2, 0.6 * MEMORY_MB|int // 2048, DISK_GB|int // 20, compute_node_count.stdout|int * 120] | min | int }}
+      when: "workload == 'nova-boot-in-batches-with-delay'"
+
+    # The below factors have been scaled based on the parameter values that were set
+    # for booting 25000 VMs previously.
+    - name: Set iterations_per_batch and num_tenant_networks for nova-boot-in-batches-with-delay
+      set_fact:
+        delay_time={{ [times|int * 0.024, 30] | max }}
+        iterations_per_batch={{ times|int // 8 }}
+        num_tenant_networks={{ [times|int // 1250, 1] | max }}
+      when: "workload == 'nova-boot-in-batches-with-delay'"
+
+    # Dynamic workloads boots approximately 18 VMs with m1.tiny-cirros flavor and 2 VMs with m1.tiny-centos flavor
+    # in each iteration. The values below have been set accordingly keeping in mind the initial constraints.
+    - name: Set parameters for dynamic-workloads
+      set_fact:
+        times={{ [VCPU|int // 40, 0.6 * MEMORY_MB|int // 2688, DISK_GB|int // 34, compute_node_count.stdout|int * 6] | min | int }}
+        ext_net_id="{{ ext_net_id.stdout }}"
+        external_iface_name="{{ external_iface_name.stdout }}"
+        external_iface_mac="{{ external_iface_mac.stdout }}"
+      when: "workload == 'dynamic-workloads'"
+
+    # The largest flavor used in nova workloads is m1.small, and the values below have been set accordingly.
+    - name: Set parameters for nova workloads
+      set_fact:
+        times={{ [VCPU|int // 2, 0.6 * MEMORY_MB|int // 2048, DISK_GB|int // 20, compute_node_count.stdout|int * 120] | min | int }}
+      when: "workload == 'nova'"
+
+    # The largest flavor used in neutron-trunk workloads is m1.small. Also, one of the trunk workloads creates
+    # 50 subports per VM in one iteration. To ensure that a maximum of 150 ports per compute are created, the value
+    # for times is scaled accordingly.
+    - name: Set parameters for neutron-trunk workloads
+      set_fact:
+        times={{ [VCPU|int // 2, 0.6 * MEMORY_MB|int // 2048, DISK_GB|int // 20, compute_node_count.stdout|int * 3] | min | int }}
+      when: "workload == 'neutron-trunk'"
+
+    # 10 VMs with m1.tiny-cirros flavor are created in heat workloads, and the values below have been set accordingly.
+    - name: Set parameters for heat workloads
+      set_fact:
+        times={{ [VCPU|int // 20, 0.6 * MEMORY_MB|int // 1280, DISK_GB|int // 20, compute_node_count.stdout|int * 12] | min | int }}
+      when: "workload == 'heat'"
+
+    # The flavor used by Octavia amphorae uses 1 VCPU, 1024 MB of Memory, and 3 GB of disk.
+    # The values below have been set accordingly.
+    - name: Set parameters for octavia workloads
+      set_fact:
+        times={{ [VCPU|int // 2, 0.6 * MEMORY_MB|int // 1024, DISK_GB|int // 3, compute_node_count.stdout|int * 120, 1000] | min | int }}
+      when: "workload == 'octavia'"
+
+    - name: Generate browbeat-config.yaml
+      template:
+        src: browbeat-config.yaml.j2
+        dest: "/home/stack/browbeat/{{ workload }}-browbeat-config.yaml"
