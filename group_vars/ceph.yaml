@@ -169,26 +169,26 @@ overcloud_external_net_alloc_start: 172.18.1.1
 overcloud_external_net_alloc_end: 172.18.254.254
 
 #internal
-internal_api_net_cidr: 172.17.1.0/24
+internal_api_net_cidr: 172.17.1.0/16
 internal_api_allocation_pools_start: 172.17.1.10
 internal_api_allocation_pools_end: 172.17.1.149
 internal_api_network_vlan_id: 301
 #storage
-storage_net_cidr: 172.17.3.0/24
+storage_net_cidr: 172.17.3.0/16
 storage_allocation_pools_start: 172.17.3.10
 storage_allocation_pools_end: 172.17.3.149
 storage_network_vlan_id: 302
-storage_mgmt_net_cidr: 172.17.4.0/24
+storage_mgmt_net_cidr: 172.17.4.0/16
 storage_mgmt_allocation_pools_start: 172.17.4.10
 storage_mgmt_allocation_pools_end: 172.17.4.149
 storage_mgmt_network_vlan_id: 303
 #storage_nfs
-storage_nfs_net_cidr: 172.17.5.0/24
+storage_nfs_net_cidr: 172.17.5.0/16
 storage_nfs_network_vlan_id: 305
 storage_nfs_allocation_pools_start: 172.17.5.10
 storage_nfs_allocation_pools_end: 172.17.5.149
 #tenant
-tenant_net_cidr: 172.17.2.0/24
+tenant_net_cidr: 172.17.2.0/16
 tenant_allocation_pools_start: 172.17.2.10
 tenant_allocation_pools_end: 172.17.2.150
 tenant_network_vlan_id: 304
