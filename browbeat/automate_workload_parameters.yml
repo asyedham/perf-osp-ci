@@ -64,14 +64,19 @@
       set_fact:
         workload: "{{ lookup('ansible.builtin.env', 'WORKLOAD', default=undef()) }}"
 
-    # The workloads have been set to use 50% of available VCPUs, 60% of available memory, and a maximum of 120 VMs per compute node,
-    # in order to prevent the environment from becoming unstable.
-    #
+    # The workloads have been set to use 50% of available VCPUs, available memory excluding 8 GB on each compute node,
+    # and a maximum of 120 VMs per compute node, in order to prevent the environment from becoming unstable.
+
+    - name: Set ext_net_id for API workloads
+      set_fact:
+        ext_net_id="{{ ext_net_id.stdout }}"
+      when: "workload == 'api'"
+
     # We usually use the m1.small flavor for VMs in nova-boot-in-batches-with-delay.
     # The m1.small flavor requires 1 VCPU, 2048 MB of memory, and 20 GB of disk.
     - name: Set times for nova-boot-in-batches-with-delay
       set_fact:
-        times={{ [VCPU|int // 2, 0.6 * MEMORY_MB|int // 2048, DISK_GB|int // 20, compute_node_count.stdout|int * 120] | min | int }}
+        times={{ [VCPU|int // 2, (MEMORY_MB|int - 8192 * compute_node_count.stdout|int) // 2048, DISK_GB|int // 20, compute_node_count.stdout|int * 120] | min | int }}
       when: "workload == 'nova-boot-in-batches-with-delay'"
 
     # The below factors have been scaled based on the parameter values that were set
@@ -87,7 +92,7 @@
     # in each iteration. The values below have been set accordingly keeping in mind the initial constraints.
     - name: Set parameters for dynamic-workloads
       set_fact:
-        times={{ [VCPU|int // 40, 0.6 * MEMORY_MB|int // 2688, DISK_GB|int // 34, compute_node_count.stdout|int * 6] | min | int }}
+        times={{ [VCPU|int // 40, (MEMORY_MB|int - 8192 * compute_node_count.stdout|int) // 2752, DISK_GB|int // 34, compute_node_count.stdout|int * 6] | min | int }}
         ext_net_id="{{ ext_net_id.stdout }}"
         external_iface_name="{{ external_iface_name.stdout }}"
         external_iface_mac="{{ external_iface_mac.stdout }}"
@@ -96,7 +101,7 @@
     # The largest flavor used in nova workloads is m1.small, and the values below have been set accordingly.
     - name: Set parameters for nova workloads
       set_fact:
-        times={{ [VCPU|int // 2, 0.6 * MEMORY_MB|int // 2048, DISK_GB|int // 20, compute_node_count.stdout|int * 120] | min | int }}
+        times={{ [VCPU|int // 2, (MEMORY_MB|int - 8192 * compute_node_count.stdout|int) // 2048, DISK_GB|int // 20, compute_node_count.stdout|int * 120] | min | int }}
       when: "workload == 'nova'"
 
     # The largest flavor used in neutron-trunk workloads is m1.small. Also, one of the trunk workloads creates
@@ -104,20 +109,20 @@
     # for times is scaled accordingly.
     - name: Set parameters for neutron-trunk workloads
       set_fact:
-        times={{ [VCPU|int // 2, 0.6 * MEMORY_MB|int // 2048, DISK_GB|int // 20, compute_node_count.stdout|int * 3] | min | int }}
+        times={{ [VCPU|int // 2, (MEMORY_MB|int - 8192 * compute_node_count.stdout|int) // 2048, DISK_GB|int // 20, compute_node_count.stdout|int * 3] | min | int }}
       when: "workload == 'neutron-trunk'"
 
     # 10 VMs with m1.tiny-cirros flavor are created in heat workloads, and the values below have been set accordingly.
     - name: Set parameters for heat workloads
       set_fact:
-        times={{ [VCPU|int // 20, 0.6 * MEMORY_MB|int // 1280, DISK_GB|int // 20, compute_node_count.stdout|int * 12] | min | int }}
+        times={{ [VCPU|int // 20, (MEMORY_MB|int - 8192 * compute_node_count.stdout|int) // 1280, DISK_GB|int // 20, compute_node_count.stdout|int * 12] | min | int }}
       when: "workload == 'heat'"
 
     # The flavor used by Octavia amphorae uses 1 VCPU, 1024 MB of Memory, and 3 GB of disk.
     # The values below have been set accordingly.
     - name: Set parameters for octavia workloads
       set_fact:
-        times={{ [VCPU|int // 2, 0.6 * MEMORY_MB|int // 1024, DISK_GB|int // 3, compute_node_count.stdout|int * 120, 1000] | min | int }}
+        times={{ [VCPU|int // 2, (MEMORY_MB|int - 8192 * compute_node_count.stdout|int) // 1024, DISK_GB|int // 3, compute_node_count.stdout|int * 120, 1000] | min | int }}
       when: "workload == 'octavia'"
 
     - name: Generate browbeat-config.yaml
