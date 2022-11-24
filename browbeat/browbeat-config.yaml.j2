@@ -139,7 +139,7 @@ workloads:
         enabled: true
         image_name: centos7
         flavor_name: m1.small
-        ext_net_id:
+        ext_net_id: {{ ext_net_id }}
         file: rally/rally-plugins/cinder/boot_vm_attach_detach_volume.yml
 
   - name: keystonebasic
