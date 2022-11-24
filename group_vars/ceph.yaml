@@ -13,7 +13,7 @@ osp_release: "{{ lookup('env', 'OSP_VERSION')|default('', true) }}"
 osp_puddle: "{{ lookup('env', 'OSP_PUDDLE')|default('', true) }}"
 baseurl: http://download.eng.pek2.redhat.com/released/RHEL-7/7.9/Server/x86_64/os/
 nic_configs: "{{ ansible_user_dir }}/virt"
-controller_count: 2
+controller_count: 3
 # No need to set compute_count. This will be set to all remaining nodes, which is calculated in overcloud.yml
 #compute_count: 1
 ceph_node_count: 3
@@ -265,7 +265,7 @@ composable_roles: "{{ lookup('env', 'COMPOSABLE_ROLES')|default(false, true)|boo
 # if your machine is 1029U type you need to specify the product type also
 # refer http://wiki.scalelab.redhat.com/1029u/ for list of 1029utn10rt machines
 # rest are 1029utrtp machines
-controller_machine_type: "r650"
+#controller_machine_type: "r650"
 
 #Ceph deployment params
 # if your machine is 1029U type you need to specify the product type also
