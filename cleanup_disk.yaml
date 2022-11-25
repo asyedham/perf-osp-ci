@@ -16,3 +16,9 @@
       shell: |
         source ~/stackrc
         openstack overcloud node clean --all-manageable --provide
+      ignore_errors: yes
+     
+    - name: move the nodes to available state
+      shell: |
+        source ~/stackrc
+        for i in $(openstack baremetal node list -c UUID -f value); do openstack baremetal node provide $i; done
