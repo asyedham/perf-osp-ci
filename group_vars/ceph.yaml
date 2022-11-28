@@ -123,7 +123,8 @@ interfaces:
 # after overcloud deployment as part of post deployment tasks.
 #public_net_name: public
 
-#extra_templates:
+extra_templates:
+  - /usr/share/openstack-tripleo-heat-templates/environments/services/octavia.yaml
 
 #heat_configs:
   # Enable root user password for all nodes
