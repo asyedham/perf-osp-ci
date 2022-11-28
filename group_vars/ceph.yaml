@@ -157,40 +157,40 @@ dhcp_end: "{{ lookup('env', 'DHCP_END')|default('', true) }}"
 inspection_iprange: "{{ lookup('env', 'INSPECTION_IPRANGE')|default('', true) }}"
 # external network params for adding external network to
 # undercloud to access overcloud resources
-external_gateway: 172.18.0.1/16
+external_gateway: 192.173.0.1/16
 external_network_vlan_id: 300
 clean_nodes: false
 #adding changes 
-external_net_cidr: 172.18.0.0/16
-external_allocation_pools_start: 172.18.0.50
-external_allocation_pools_end: 172.18.0.150
-external_interface_default_route: 172.18.0.1
-overcloud_external_net_alloc_start: 172.18.1.1
-overcloud_external_net_alloc_end: 172.18.254.254
+external_net_cidr: 192.173.0.0/16
+external_allocation_pools_start: 192.173.0.2
+external_allocation_pools_end: 192.173.1.254
+external_interface_default_route: 192.173.0.1
+overcloud_external_net_alloc_start: 192.173.1.1
+overcloud_external_net_alloc_end: 192.173.254.254
 
 #internal
-internal_api_net_cidr: 172.17.1.0/16
-internal_api_allocation_pools_start: 172.17.1.10
-internal_api_allocation_pools_end: 172.17.1.149
+internal_api_net_cidr: 192.170.0.0/16
+internal_api_allocation_pools_start: 192.170.0.2
+internal_api_allocation_pools_end: 192.170.1.254
 internal_api_network_vlan_id: 301
 #storage
-storage_net_cidr: 172.17.3.0/16
-storage_allocation_pools_start: 172.17.3.10
-storage_allocation_pools_end: 172.17.3.149
+storage_net_cidr: 192.169.0.0/16
+storage_allocation_pools_start: 192.169.0.2
+storage_allocation_pools_end: 192.169.1.254
 storage_network_vlan_id: 302
-storage_mgmt_net_cidr: 172.17.4.0/16
-storage_mgmt_allocation_pools_start: 172.17.4.10
-storage_mgmt_allocation_pools_end: 172.17.4.149
+storage_mgmt_net_cidr: 192.168.32.0/24
+storage_mgmt_allocation_pools_start: 192.168.32.2
+storage_mgmt_allocation_pools_end: 192.168.32.254
 storage_mgmt_network_vlan_id: 303
 #storage_nfs
-storage_nfs_net_cidr: 172.17.5.0/16
+storage_nfs_net_cidr: 192.172.0.0/16
 storage_nfs_network_vlan_id: 305
-storage_nfs_allocation_pools_start: 172.17.5.10
-storage_nfs_allocation_pools_end: 172.17.5.149
+storage_nfs_allocation_pools_start: 192.172.0.2
+storage_nfs_allocation_pools_end: 192.172.1.254
 #tenant
-tenant_net_cidr: 172.17.2.0/16
-tenant_allocation_pools_start: 172.17.2.10
-tenant_allocation_pools_end: 172.17.2.150
+tenant_net_cidr: 192.171.0.0/16
+tenant_allocation_pools_start: 192.171.0.2
+tenant_allocation_pools_end: 192.171.1.254
 tenant_network_vlan_id: 304
 #This allows the user to force re provision undercloud
 #default is false - not forced
