@@ -12,10 +12,10 @@
         source ~/stackrc
         for i in $(openstack baremetal node list -c UUID -f value); do openstack baremetal node manage $i; done
    
-    - name: clean the nodes and move to available
+    - name: clean the nodes
       shell: |
         source ~/stackrc
-        openstack overcloud node clean --all-manageable --provide
+        for i in $(openstack baremetal node list -c UUID -f value); do openstack baremetal node clean $i --clean-steps '[{"interface": "deploy", "step": "erase_devices_metadata"}]'; done
       ignore_errors: yes
      
     - name: move the nodes to available state
