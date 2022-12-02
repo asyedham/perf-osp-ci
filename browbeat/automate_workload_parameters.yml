@@ -22,7 +22,7 @@
     - name: Clone osp-ci on undercloud
       git:
         repo: https://github.com/asyedham/osp-ci.git
-        dest: /home/stack/
+        dest: /home/stack/osp-ci
         
     - name: Get raw output from placement CLI
       shell: |
