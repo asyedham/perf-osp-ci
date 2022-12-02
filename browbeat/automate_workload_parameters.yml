@@ -126,7 +126,7 @@
       when: "workload == 'octavia'"
 
     - name: Generate browbeat-config.yaml
-      template:
+      copy:
         src: /home/stack/osp-ci/browbeat/browbeat-config.yaml.j2
         dest: "/home/stack/browbeat/{{ workload }}-browbeat-config.yaml"
         
