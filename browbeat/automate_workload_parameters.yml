@@ -19,11 +19,6 @@
     DISK_GB: 0
 
   tasks:
-    - name: Clone osp-ci on undercloud
-      git:
-        repo: https://github.com/asyedham/osp-ci.git
-        dest: /home/stack/osp-ci
-        
     - name: Get raw output from placement CLI
       shell: |
         source /home/stack/overcloudrc
@@ -126,8 +121,8 @@
       when: "workload == 'octavia'"
 
     - name: Generate browbeat-config.yaml
-      copy:
-        src: /home/stack/osp-ci/browbeat/browbeat-config.yaml.j2
+      template:
+        src: "{{ ansible_user_dir }}/osp-ci/browbeat/browbeat-config.yaml.j2"
         dest: "/home/stack/browbeat/{{ workload }}-browbeat-config.yaml"
         
     - name:  Run the workloads
