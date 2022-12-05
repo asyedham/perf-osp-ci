@@ -127,12 +127,13 @@
 
     - name: Generate browbeat-config.yaml
       template:
-        src: "{{ ansible_user_dir }}/osp-ci/browbeat/browbeat-config.yaml.j2"
+        src: "/var/lib/jenkins/osp-ci/browbeat/browbeat-config.yaml.j2"
         dest: "/home/stack/browbeat/{{ workload }}-browbeat-config.yaml"
-        
+
     - name:  Run the workloads
       shell: |
-         source .venv/bin/activate
+         source .browbeat-venv/bin/activate
          ./browbeat.py -s "{{ workload }}-browbeat-config.yaml"
       args:
         chdir: "/home/stack/browbeat"
+
