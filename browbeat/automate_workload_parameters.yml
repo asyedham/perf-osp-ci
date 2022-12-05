@@ -85,7 +85,7 @@
       set_fact:
         delay_time={{ [times|int * 0.024, 30] | max }}
         iterations_per_batch={{ times|int // 8 }}
-        num_tenant_networks={{ [times|int // 1250, 1] | max }}
+        num_tenants={{ [times|int // 1250, 1] | max }}
       when: "workload == 'nova-boot-in-batches-with-delay'"
 
     # Dynamic workloads boots approximately 18 VMs with m1.tiny-cirros flavor and 2 VMs with m1.tiny-centos flavor

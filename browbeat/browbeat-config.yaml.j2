@@ -352,7 +352,8 @@ workloads:
         # Setting this value to a small multiple(1x or 2x) of the concurrency is optimal.
         # num_iterations_to_delay should always be lesser than iterations_per_batch.
         num_iterations_to_delay: 16
-        num_tenant_networks: {{ num_tenant_networks }}
+        num_tenants: {{ num_tenants }}
+        num_networks_per_tenant: 10
         file: rally/rally-plugins/nova/nova_boot_in_batches_with_delay.yml
 {% endif %}
 {% if workload == "dynamic-workloads" %}
