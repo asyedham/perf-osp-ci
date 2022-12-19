@@ -1,0 +1,31 @@
+---
+- hosts: undercloud
+  vars:
+    introspection_concurrency: "{{ lookup('env', 'INTROSPECTION_CONCURRENCY')|default('20', true) }}"
+  tasks:
+    - name: get the count of nodes in available state
+      shell: |
+        source ~/stackrc
+        openstack baremetal node list | grep -i available | wc -l
+      register: available_state_nodes
+
+    - name: display available nodes count
+      debug:
+        var: available_state_nodes.stdout
+
+    - name: move the nodes to manageable state
+      shell: |
+        source ~/stackrc
+        for i in $(openstack baremetal node list -c UUID -f value); do openstack baremetal node manage $i; done
+
+    - name: introspecting overcloud nodes
+      shell: |
+        source ~/stackrc
+        (time openstack overcloud node introspect --all-manageable --provide) &> introspect.log
+      when: introspection_concurrency == 20
+
+    - name: introspecting overcloud nodes with batch size {{ concurrency }}
+      shell: |
+        source ~/stackrc
+        (time openstack overcloud node introspect --all-manageable --provide --concurrency {{ introspection_concurrency|int }}) &> introspect.log
+      when: introspection_concurrency > 20
