@@ -294,7 +294,7 @@ manila_enabled: "{{ lookup('env', 'MANILA_ENABLED')|default(true, true)|bool }}"
 # DVR is enabled by default for osp_releases >= 16, set this to false for non-dvr based deployments.
 # This variable has no affect on osp_releases < 16, as jetpack doesn't support dvr for osp_releases < 16 as of now.
 dvr_enabled: "{{ lookup('env', 'DVR_ENABLED')|default(true, true)|bool }}"
-
+barbican_enabled: "{{ lookup('env', 'BARBICAN_ENABLED')|default(false, true)|bool }}"
 # TLS-Everywhere has been tested on OSP 17.
 tls_everywhere: "{{ lookup('env', 'TLS_EVERYWHERE')|default(true, true)|bool }}"
 # vars for TLS-Everywhere deployment
